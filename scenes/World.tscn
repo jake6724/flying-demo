@@ -1,0 +1,63 @@
+[gd_scene load_steps=9 format=3 uid="uid://c78qi5xkjwlxr"]
+
+[ext_resource type="Texture2D" uid="uid://hil1bhbxqduk" path="res://assets/AllSkyFree_Sky_ClearBlueSky_Equirect.png" id="1_kqs1s"]
+[ext_resource type="Shader" uid="uid://tyj55hwswxnh" path="res://materials/shaders/grid.gdshader" id="2_7g83o"]
+[ext_resource type="PackedScene" uid="uid://bm6rm6n3jxstv" path="res://scenes/Glider.tscn" id="2_32lhk"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_32lhk"]
+panorama = ExtResource("1_kqs1s")
+
+[sub_resource type="Sky" id="Sky_7g83o"]
+sky_material = SubResource("PanoramaSkyMaterial_32lhk")
+
+[sub_resource type="Environment" id="Environment_d1c63"]
+background_mode = 2
+sky = SubResource("Sky_7g83o")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g83o"]
+render_priority = 0
+shader = ExtResource("2_7g83o")
+shader_parameter/subdivisions = 32.0
+shader_parameter/grid_width = 0.02
+shader_parameter/background_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/background_color_two = Color(0.1, 0.1, 0.1, 1)
+shader_parameter/grid_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/dashed_scale_x = 0.02
+shader_parameter/dashed_scale_y = 0.02
+shader_parameter/dashed_count_x = 1.0
+shader_parameter/dashed_count_y = 1.0
+shader_parameter/point_width = 0.021
+shader_parameter/point_color = Color(0, 0, 0, 1)
+shader_parameter/point_scale_x = 0.05
+shader_parameter/point_scale_y = 0.05
+shader_parameter/inside_width = 0.01
+shader_parameter/inside_subdivisions = 6.0
+shader_parameter/inside_color = Color(0.4, 0.4, 0.4, 1)
+shader_parameter/in_dashed_scale_x = 0.3
+shader_parameter/in_dashed_scale_y = 0.3
+shader_parameter/in_dashed_count_x = 6.0
+shader_parameter/in_dashed_count_y = 6.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1lgw5"]
+next_pass = SubResource("ShaderMaterial_7g83o")
+albedo_color = Color(0.1584723, 0.15847233, 0.1584723, 1)
+
+[node name="World" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_d1c63")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 13)
+use_collision = true
+size = Vector3(116, 1, 167)
+material = SubResource("StandardMaterial3D_1lgw5")
+
+[node name="Glider" parent="." instance=ExtResource("2_32lhk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 68)

@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://bm6rm6n3jxstv"]
+
+[ext_resource type="Script" uid="uid://dtwoetsvw63ul" path="res://scripts/glider.gd" id="1_df3d8"]
+[ext_resource type="Material" uid="uid://bpt63yhb2lbod" path="res://materials/MaterialGlider.tres" id="1_epb0v"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_2x8ny"]
+size = Vector3(6, 1, 5)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_df3d8"]
+points = PackedVector3Array(0, 1.5, 0.25, 3, -1.5, 0.25, 0, 1.5, -0.25, -3, -1.5, 0.25, 3, -1.5, -0.25, -3, -1.5, -0.25)
+
+[node name="Glider" type="CharacterBody3D" node_paths=PackedStringArray("camera", "camera_pivot", "skin")]
+script = ExtResource("1_df3d8")
+camera = NodePath("CameraPivot/Camera")
+camera_pivot = NodePath("CameraPivot")
+skin = NodePath("MeshInstance3D")
+metadata/_custom_type_script = "uid://dtwoetsvw63ul"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PrismMesh_2x8ny")
+surface_material_override/0 = ExtResource("1_epb0v")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_df3d8")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+
+[node name="Camera" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.9659259, 0.25881907, 0, -0.25881907, 0.9659258, 0, 2, 5)
