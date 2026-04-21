@@ -6,13 +6,13 @@ extends CharacterBody3D
 var camera_input_direction: Vector2
 
 var move_direction: Vector3
-var move_speed: float = 10.0
-var acceleration: float = 70.0
+var move_speed: float = 50.0
+var acceleration: float = 200.0
 
 var max_tilt: float = 45
 var tilt: float = 0.0
-var tilt_multiplier: float = 1.2
-var level_out_multiplier: float = 25.0
+var tilt_multiplier: float = 1.8
+var level_out_multiplier: float = 40.0
 
 var gravity: float = 0
 
@@ -42,12 +42,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			camera_input_direction = event.screen_relative * mouse_sensitivty
 			tilt = (clampf(tilt + deg_to_rad((-event.screen_relative.x * tilt_multiplier)), -max_tilt, max_tilt))
 
-
 func _physics_process(delta):
 	# Set X and Y camera rotation. Clamp X axis so player cannot look fully up or down
 	camera_pivot.rotation.x -= camera_input_direction.y * delta
 	camera_pivot.rotation.y -= camera_input_direction.x  * delta
-	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, (-PI / 4.0), (PI / 6.0))
+	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, (-PI / 16.0), (PI / 6.0))
 
 	# Reset camera_input_direction for the next time _unhandled_input() is triggered
 	# If this is not reset, the camera will keep rotating until new input comes in
@@ -66,7 +65,7 @@ func _physics_process(delta):
 	move_direction.y = 0.0 # Player will never give up-and-down move input. Jumping and falling with handle this
 	move_direction = move_direction.normalized() # This is just intended to be a direction vector so it needs to be normalized
 
-	# Acceleration can be added by using move_toward(). This will also prevent overshooting inheritly
+	# Acceleration can be added by using move_toward(). This will also prevent overshooting
 	var y_velocity = velocity.y
 	velocity.y = 0.0
 	velocity = velocity.move_toward((move_direction * move_speed), acceleration * delta)

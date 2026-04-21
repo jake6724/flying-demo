@@ -4,14 +4,14 @@
 [ext_resource type="Material" uid="uid://bpt63yhb2lbod" path="res://materials/MaterialGlider.tres" id="1_epb0v"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_2x8ny"]
-size = Vector3(6, 1, 5)
+size = Vector3(6, 0.5, 5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_df3d8"]
 points = PackedVector3Array(0, 1.5, 0.25, 3, -1.5, 0.25, 0, 1.5, -0.25, -3, -1.5, 0.25, 3, -1.5, -0.25, -3, -1.5, -0.25)
 
 [node name="Glider" type="CharacterBody3D" node_paths=PackedStringArray("camera", "camera_pivot", "skin")]
 script = ExtResource("1_df3d8")
-camera = NodePath("CameraPivot/Camera")
+camera = NodePath("CameraPivot/SpringArm3D/Camera3D")
 camera_pivot = NodePath("CameraPivot")
 skin = NodePath("MeshInstance3D")
 metadata/_custom_type_script = "uid://dtwoetsvw63ul"
@@ -26,5 +26,9 @@ shape = SubResource("ConvexPolygonShape3D_df3d8")
 
 [node name="CameraPivot" type="Node3D" parent="."]
 
-[node name="Camera" type="Camera3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, 0.9659259, 0.25881907, 0, -0.25881907, 0.9659258, 0, 2, 5)
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8079899, 0.5891963, 0, -0.5891963, 0.8079899, 0, 0, -1)
+collision_mask = 0
+spring_length = 12.0
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
