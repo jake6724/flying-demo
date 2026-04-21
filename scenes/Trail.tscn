@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dviseoks5ejnc"]
+
+[ext_resource type="Script" uid="uid://bwy8ukvudothk" path="res://scripts/trail.gd" id="1_assad"]
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_assad"]
+
+[node name="Trail" type="MeshInstance3D"]
+mesh = SubResource("ImmediateMesh_assad")
+script = ExtResource("1_assad")
+metadata/_custom_type_script = "uid://bwy8ukvudothk"
