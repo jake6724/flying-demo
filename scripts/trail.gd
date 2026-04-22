@@ -1,57 +1,121 @@
-class_name Trail
-extends MeshInstance3D
+@tool
+class_name Trail3D extends MeshInstance3D
 
-var prev: Vector3 = Vector3.ZERO
+enum InterpolationMode {
+	LINEAR,
+	SQUARE,
+	CUBE,
+	QUAD
+}
+enum InterpolationDirection {
+	FORWARD,
+	BACKWARD
+}
 
-var queue: Array = []
+var points: Array[Vector3]  = []
+var widths: Array  = []
+var lifePoints: Array[float] = []
 
-# func _ready():
-# 	# Begin draw.
-# 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+@export var trailEnabled: bool = true
 
-# 	# Prepare attributes for add_vertex.
-# 	mesh.surface_set_normal(Vector3(0, 0, 1))
-# 	mesh.surface_set_uv(Vector2(0, 0))
-# 	# Call last for each vertex, adds the above attributes.
-# 	mesh.surface_add_vertex(Vector3(-1, -1, 0))
+@export var fromWidth: float = 0.5
+@export var toWidth: float = 0.0
+@export_range(0.5, 1.5) var scaleAcceleration: float  = 1.0
 
-# 	mesh.surface_set_normal(Vector3(0, 0, 1))
-# 	mesh.surface_set_uv(Vector2(0, 1))
-# 	mesh.surface_add_vertex(Vector3(-1, 1, 0))
+@export var motionDelta: float = 0.1
+@export var lifespan: float = 1.0
 
-# 	mesh.surface_set_normal(Vector3(0, 0, 1))
-# 	mesh.surface_set_uv(Vector2(1, 1))
-# 	mesh.surface_add_vertex(Vector3(1, 1, 0))
+@export var scaleTexture: bool = true
+@export var startColor: Color = Color(1.0, 1.0, 1.0, 1.0)
+@export var endColor: Color = Color(1.0, 1.0, 1.0, 0.0)
 
-	# # End drawing.
-	# mesh.surface_end()
 
-func _process(delta):
+@export var colorInterpolationMode: InterpolationMode = InterpolationMode.LINEAR
+@export var interpolationDirection: InterpolationDirection = InterpolationDirection.FORWARD
+
+var oldPos: Vector3
+
+func _ready() -> void:
+	oldPos = get_global_transform().origin
+	mesh = ImmediateMesh.new()
+
+func _process(delta: float) -> void:
+	if (oldPos - get_global_transform().origin).length() > motionDelta and trailEnabled:
+		appendPoint()
+		oldPos = get_global_transform().origin
+
+	var p: int = 0
+	var max_points: int = points.size()
+	while p < max_points:
+		lifePoints[p] += delta
+		if lifePoints[p] > lifespan:
+			removePoint(p)
+			p -= 1
+			if (p < 0): p = 0
+
+		max_points = points.size()
+		p += 1
+
 	mesh.clear_surfaces()
-	var material := ORMMaterial3D.new()
 
+	if points.size() < 2:
+		return
 
-	queue.append((transform.origin))
-	if queue.size() > 10:
-		queue.pop_front()
+	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 
-	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP, material)
-	if queue.size() % 2 == 0:
-		for point: Vector3 in queue:
-			mesh.surface_add_vertex(point)
-			mesh.surface_add_vertex(point + (Vector3(-10, 0, 0)))
-			mesh.surface_add_vertex(point + (Vector3(10, 0, 0)))
-		mesh.surface_end()
+	for i in range(points.size()):
+		var t: float = float(i) / (points.size() - 1.0)
 
-	print(queue)
+		var currColor: Color = endColor
 
-	# if prev != Vector3.ZERO:
-	# 	# Begin draw.
-	# 	mesh.surface_begin(Mesh.PRIMITIVE_POINTS)
-	# 	# mesh.surface_add_vertex(prev)
-	# 	# Add point
-	# 	mesh.surface_add_vertex(global_position)
-	# 	# End
-	# 	mesh.surface_end()
+		var progress: float = t
 
-	# prev = global_position
+		if interpolationDirection == InterpolationDirection.BACKWARD:
+			progress = 1 - t
+
+		if colorInterpolationMode == InterpolationMode.LINEAR:
+			currColor = startColor.lerp(endColor, 1 - progress)
+		elif colorInterpolationMode == InterpolationMode.SQUARE:
+			currColor = startColor.lerp(endColor, 1- (progress ** 2))
+		elif colorInterpolationMode == InterpolationMode.CUBE:
+			currColor = startColor.lerp(endColor, 1 - pow(progress, 3))
+		elif colorInterpolationMode == InterpolationMode.QUAD:
+			currColor = startColor.lerp(endColor,1- pow(progress, 4))
+
+		mesh.surface_set_color(currColor)
+
+		var currWidth: Vector3 = widths[i][0] - pow(1-t, scaleAcceleration) * widths[i][1]
+
+		if scaleTexture:
+			var t0: float = motionDelta * i
+			var t1: float = motionDelta * (i + 1)
+			mesh.surface_set_uv(Vector2(t0, 0))
+			mesh.surface_add_vertex(to_local(points[i] + currWidth))
+			mesh.surface_set_uv(Vector2(t1, 1))
+			mesh.surface_add_vertex(to_local(points[i] - currWidth))
+		else:
+			var t0: float = i / points.size()
+			var t1: float = t
+
+			mesh.surface_set_uv(Vector2(t0, 0))
+			mesh.surface_add_vertex(to_local(points[i] + currWidth))
+			mesh.surface_set_uv(Vector2(t1, 1))
+			mesh.surface_add_vertex(to_local(points[i] - currWidth))
+	mesh.surface_end()
+
+func appendPoint() -> void:
+	var direction: Vector3 = get_global_transform().origin - oldPos
+	direction = direction.normalized()
+	rotation.y = atan2(direction.x, direction.z)
+
+	points.append(get_global_transform().origin)
+	widths.append([
+		get_global_transform().basis.x * fromWidth,
+		get_global_transform().basis.x * fromWidth - get_global_transform().basis.x * toWidth
+	])
+	lifePoints.append(0.0)
+
+func removePoint(i: int) -> void:
+	points.remove_at(i)
+	widths.remove_at(i)
+	lifePoints.remove_at(i)

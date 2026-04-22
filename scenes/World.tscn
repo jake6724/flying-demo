@@ -29,10 +29,10 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 211, 68)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -34.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 0, 1366.5)
 use_collision = true
 collision_mask = 0
-size = Vector3(187, 1, 332)
+size = Vector3(1836, 1, 4484)
 material = ExtResource("3_7g83o")
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="."]

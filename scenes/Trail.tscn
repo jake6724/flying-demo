@@ -1,10 +1,45 @@
-[gd_scene load_steps=3 format=3 uid="uid://dviseoks5ejnc"]
+[gd_scene load_steps=8 format=3 uid="uid://dviseoks5ejnc"]
 
 [ext_resource type="Script" uid="uid://bwy8ukvudothk" path="res://scripts/trail.gd" id="1_assad"]
 
-[sub_resource type="ImmediateMesh" id="ImmediateMesh_assad"]
+[sub_resource type="Gradient" id="Gradient_assad"]
+colors = PackedColorArray(0.18039216, 0.4509804, 0.92941177, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xmr1o"]
+gradient = SubResource("Gradient_assad")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eviqj"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_texture = SubResource("GradientTexture2D_xmr1o")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_assad"]
+gravity = Vector3(0, 0, 0)
+
+[sub_resource type="Curve" id="Curve_assad"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.9155219, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_xmr1o"]
+radius = 0.1
+sections = 2
+section_length = 5.0
+curve = SubResource("Curve_assad")
 
 [node name="Trail" type="MeshInstance3D"]
-mesh = SubResource("ImmediateMesh_assad")
+material_override = SubResource("StandardMaterial3D_eviqj")
+cast_shadow = 0
 script = ExtResource("1_assad")
+lifespan = 2.0
+startColor = Color(0.18039216, 0.4509804, 0.92941177, 1)
 metadata/_custom_type_script = "uid://bwy8ukvudothk"
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+visible = false
+amount = 10
+lifetime = 0.09999999999999999
+process_material = SubResource("ParticleProcessMaterial_assad")
+draw_pass_1 = SubResource("TubeTrailMesh_xmr1o")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bm6rm6n3jxstv"]
+[gd_scene load_steps=8 format=3 uid="uid://bm6rm6n3jxstv"]
 
 [ext_resource type="Script" uid="uid://dtwoetsvw63ul" path="res://scripts/glider.gd" id="1_df3d8"]
 [ext_resource type="Material" uid="uid://bpt63yhb2lbod" path="res://materials/MaterialGlider.tres" id="1_epb0v"]
@@ -7,19 +7,38 @@
 [sub_resource type="PrismMesh" id="PrismMesh_2x8ny"]
 size = Vector3(6, 0.5, 5)
 
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_gsbiv"]
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_cpa3s"]
+
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_df3d8"]
 points = PackedVector3Array(-3, -0.25, -2.5, -3, -0.25, 2.5, 0, 0.25, -2.5, 3, -0.25, -2.5, 3, -0.25, 2.5, 0, 0.25, 2.5)
 
-[node name="Glider" type="CharacterBody3D" node_paths=PackedStringArray("camera", "camera_pivot", "skin")]
+[node name="Glider" type="CharacterBody3D" node_paths=PackedStringArray("camera", "camera_pivot", "trail_left", "trail_right", "skin")]
 script = ExtResource("1_df3d8")
 camera = NodePath("CameraPivot/SpringArm3D/Camera3D")
 camera_pivot = NodePath("CameraPivot")
+trail_left = NodePath("MeshInstance3D/TrailLeft")
+trail_right = NodePath("MeshInstance3D/TrailRight")
 skin = NodePath("MeshInstance3D")
 metadata/_custom_type_script = "uid://dtwoetsvw63ul"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("PrismMesh_2x8ny")
 surface_material_override/0 = ExtResource("1_epb0v")
+
+[node name="TrailLeft" parent="MeshInstance3D" instance=ExtResource("3_gsbiv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9247289, -0.25639796, 2.3488638)
+mesh = SubResource("ImmediateMesh_gsbiv")
+skeleton = NodePath("../..")
+
+[node name="TrailRight" parent="MeshInstance3D" instance=ExtResource("3_gsbiv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9588346, -0.25639796, 2.3488638)
+mesh = SubResource("ImmediateMesh_cpa3s")
+skeleton = NodePath("../..")
+toWidth = 0.1
+lifespan = 0.2
+endColor = Color(0.7288462, 0.8274011, 0.99375933, 1)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("ConvexPolygonShape3D_df3d8")
@@ -32,6 +51,3 @@ collision_mask = 0
 spring_length = 12.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
-
-[node name="Trail" parent="." instance=ExtResource("3_gsbiv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.785804)
